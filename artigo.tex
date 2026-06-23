@@ -13,39 +13,51 @@
 \usepackage{url}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
+\makeatletter
+\newcommand{\linebreakand}{%
+  \end{@IEEEauthorhalign}
+  \hfill\mbox{}\par
+  \mbox{}\hfill\begin{@IEEEauthorhalign}
+}
+\makeatother
+
 \begin{document}
 
 \title{Um Sistema de Segmenta\c{c}\~ao de Clientes de Shopping baseado em K-Means com Sele\c{c}\~ao Criteriosa de Grupos e Gera\c{c}\~ao de Personas Acion\'aveis}
 
 \author{
 \IEEEauthorblockN{Chistian Daniel Pereira da Silva}
-\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
-\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informação} \\
+\textit{Instituto Metrópole Digital (IMD), UFRN}\\
 Natal/RN, Brasil}
 \and
 \IEEEauthorblockN{Enock Gomes Neto}
-\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
-\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informação} \\
+\textit{Instituto Metrópole Digital (IMD), UFRN}\\
 Natal/RN, Brasil}
-\and
+
+\linebreakand 
+
 \IEEEauthorblockN{Esdras Felipe Chaves Pinto Nascimento e Silva}
-\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
-\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informação} \\
+\textit{Instituto Metrópole Digital (IMD), UFRN}\\
 Natal/RN, Brasil}
 \and
 \IEEEauthorblockN{Gabriel Santos da Silveira}
-\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
-\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informação} \\
+\textit{Instituto Metrópole Digital (IMD), UFRN}\\
 Natal/RN, Brasil}
-\and
-\IEEEauthorblockN{Glauco Ezequiel de Sousa Gon\c{c}alves}
-\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
-\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+
+\linebreakand 
+
+\IEEEauthorblockN{Glauco Ezequiel de Sousa Gonçalves}
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informação} \\
+\textit{Instituto Metrópole Digital (IMD), UFRN}\\
 Natal/RN, Brasil}
 \and
 \IEEEauthorblockN{Vitor Fraifer Palhano dos Anjos}
-\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
-\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informação} \\
+\textit{Instituto Metrópole Digital (IMD), UFRN}\\
 Natal/RN, Brasil}
 }
 
@@ -180,6 +192,8 @@ O sistema usa apenas tr\^es atributos e um conjunto de dados de pequeno porte (2
 \section{Conclus\~ao}
 Apresentou-se um sistema de segmenta\c{c}\~ao de clientes estruturado como \textit{pipeline}, cujo n\'ucleo \'e o K-Means. As duas contribui\c{c}\~oes --- sele\c{c}\~ao de $k$ por tr\^es crit\'erios e gera\c{c}\~ao de personas acion\'aveis --- mostraram-se efetivas: o sistema produziu cinco perfis interpret\'aveis (silhueta $0{,}42$) e recomenda\c{c}\~oes de marketing coerentes. O caso de diverg\^encia entre crit\'erios ($k=5$ vs.\ $k=6$) evidenciou o valor da abordagem multicrit\'erio, que combina evid\^encia num\'erica e interpretabilidade na decis\~ao final.
 
+\clearpage 
+
 \begin{thebibliography}{00}
 \bibitem{macqueen1967} J. MacQueen, ``Some methods for classification and analysis of multivariate observations,'' in \textit{Proc. 5th Berkeley Symp. Math. Statist. Probab.}, vol. 1, 1967, pp. 281--297.
 \bibitem{rousseeuw1987} P. J. Rousseeuw, ``Silhouettes: A graphical aid to the interpretation and validation of cluster analysis,'' \textit{J. Comput. Appl. Math.}, vol. 20, pp. 53--65, 1987.
@@ -189,6 +203,8 @@ Apresentou-se um sistema de segmenta\c{c}\~ao de clientes estruturado como \text
 \bibitem{sinaga2020} K. P. Sinaga and M.-S. Yang, ``Unsupervised K-means clustering algorithm,'' \textit{IEEE Access}, vol. 8, pp. 80436--80451, 2020.
 \bibitem{ezenkwu2015} C. P. Ezenkwu, S. Ozuomba, and C. Kalu, ``Application of K-Means algorithm for efficient customer segmentation: A strategy for targeted customer services,'' \textit{Int. J. Adv. Res. Artif. Intell.}, vol. 4, no. 10, pp. 40--44, 2015.
 \end{thebibliography}
+
+\newpage
 
 \section*{Anexo --- Declara\c{c}\~ao de Uso de Intelig\^encia Artificial}
 \textbf{Ferramenta utilizada:} assistente de IA baseado em modelo de linguagem (Claude, Anthropic).
