@@ -18,17 +18,22 @@
 \title{Um Sistema de Segmenta\c{c}\~ao de Clientes de Shopping baseado em K-Means com Sele\c{c}\~ao Criteriosa de Grupos e Gera\c{c}\~ao de Personas Acion\'aveis}
 
 \author{
-\IEEEauthorblockN{Enock Gomes Neto}
-\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
-\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
-Natal/RN, Brasil}
-\and
 \IEEEauthorblockN{Chistian Daniel Pereira da Silva}
 \IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
 \textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
 Natal/RN, Brasil}
 \and
-\IEEEauthorblockN{Vitor Fraifer Palhano dos Anjos}
+\IEEEauthorblockN{Enock Gomes Neto}
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
+\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+Natal/RN, Brasil}
+\and
+\IEEEauthorblockN{Esdras Felipe Chaves Pinto Nascimento e Silva}
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
+\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+Natal/RN, Brasil}
+\and
+\IEEEauthorblockN{Gabriel Santos da Silveira}
 \IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
 \textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
 Natal/RN, Brasil}
@@ -38,7 +43,7 @@ Natal/RN, Brasil}
 \textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
 Natal/RN, Brasil}
 \and
-\IEEEauthorblockN{Esdras Felipe Chaves Pinto Nascimento e Silva}
+\IEEEauthorblockN{Vitor Fraifer Palhano dos Anjos}
 \IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
 \textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
 Natal/RN, Brasil}
@@ -68,15 +73,16 @@ O K-Means foi formalizado por MacQueen~\cite{macqueen1967} e permanece, d\'ecada
 
 Para visualiza\c{c}\~ao de dados de alta dimens\~ao, a An\'alise de Componentes Principais (PCA)~\cite{jolliffe2002} \'e amplamente adotada, projetando os dados em poucas dimens\~oes que preservam o m\'aximo de vari\^ancia. As implementa\c{c}\~oes utilizadas neste trabalho prov\^em da biblioteca \textit{scikit-learn}~\cite{pedregosa2011}. Em compara\c{c}\~ao com trabalhos que se limitam a aplicar o K-Means e reportar m\'etricas, o presente sistema agrega uma etapa de decis\~ao multicrit\'erio para $k$ e uma camada de sa\'ida orientada ao neg\'ocio.
 
-\section{Metodologia}
-O sistema proposto foi concebido como um \textit{pipeline} de processamento que transforma dados brutos de clientes em personas acion\'aveis. A Fig.~\ref{fig:arch} apresenta a arquitetura, composta por seis est\'agios.
-
-\begin{figure}[t]
+% Figura I
+\begin{figure}[ht]
 \centering
 \includegraphics[width=\columnwidth]{figuras/fig_arch.png}
 \caption{Arquitetura do sistema de segmenta\c{c}\~ao. Diagrama elaborado pelos autores (Matplotlib).}
 \label{fig:arch}
 \end{figure}
+
+\section{Metodologia}
+O sistema proposto foi concebido como um \textit{pipeline} de processamento que transforma dados brutos de clientes em personas acion\'aveis. A Fig.~\ref{fig:arch} apresenta a arquitetura, composta por seis est\'agios.
 
 \subsection{Entrada e pr\'e-processamento}
 A entrada \'e composta por tr\^es atributos por cliente: idade, renda anual e \textit{spending score} (\'indice de gasto de 1 a 100). Como esses atributos possuem escalas distintas e o K-Means se baseia em dist\^ancia euclidiana, aplica-se padroniza\c{c}\~ao \textit{z-score}, de modo que cada atributo passe a ter m\'edia zero e desvio-padr\~ao unit\'ario, evitando que a vari\'avel de maior amplitude domine o agrupamento.
@@ -100,6 +106,7 @@ O sistema foi implementado em Python com \textit{scikit-learn}~\cite{pedregosa20
 \section{Experimentos}
 O experimento principal consistiu em executar o \textit{pipeline} completo sobre o conjunto de dados e avaliar os tr\^es crit\'erios de sele\c{c}\~ao de $k$. A Tabela~\ref{tab:crit} consolida os valores obtidos; a Fig.~\ref{fig:crit} mostra as curvas correspondentes. Em seguida, fixou-se $k$ e analisou-se a separa\c{c}\~ao dos grupos no espa\c{c}o PCA e os perfis resultantes.
 
+% Tabela I
 \begin{table}[t]
 \caption{Crit\'erios de sele\c{c}\~ao de $k$ (valores em negrito indicam o \'otimo de cada crit\'erio: cotovelo em $k=5$, silhueta e Calinski-Harabasz em $k=6$).}
 \label{tab:crit}
@@ -122,6 +129,7 @@ $k$ & In\'ercia (WCSS) & Silhueta & Calinski-Harabasz \\
 \end{tabular}
 \end{table}
 
+% Figura 2
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{figuras/fig_criteria.png}
@@ -133,19 +141,21 @@ $k$ & In\'ercia (WCSS) & Silhueta & Calinski-Harabasz \\
 \subsection{Escolha de $k$ e diverg\^encia entre crit\'erios}
 Os crit\'erios n\~ao foram un\^animes. O m\'etodo do cotovelo (Fig.~\ref{fig:crit}a) exibe inflex\~ao clara em torno de $k=5$, ponto a partir do qual a redu\c{c}\~ao da in\'ercia desacelera. J\'a a silhueta e o \'indice Calinski-Harabasz atingem m\'aximo em $k=6$ (Tabela~\ref{tab:crit}), embora a diferen\c{c}a para $k=5$ seja pequena (silhueta $0{,}4274$ contra $0{,}4166$). Trata-se justamente do cen\'ario de \textit{diverg\^encia} previsto no projeto: optou-se por $k=5$, pois o ganho marginal em $k=6$ \'e modesto e os cinco grupos resultantes possuem interpreta\c{c}\~ao de neg\'ocio mais n\'itida, ao passo que o sexto grupo tende a subdividir um perfil j\'a coeso. Essa escolha privilegia a parcim\^onia e a acionabilidade sem perda relevante de qualidade num\'erica. Em termos comparativos, o coeficiente de silhueta obtido ($0{,}42$ para $k=5$; $0{,}43$ para $k=6$) enquadra-se na faixa \textit{razo\'avel} da escala de Rousseeuw~\cite{rousseeuw1987}, que considera valores entre $0{,}41$ e $0{,}60$ indicativos de estrutura moderada a boa --- resultado alinhado com trabalhos que aplicam K-Means a dados demogr\'aficos e comportamentais de escala similar~\cite{sinaga2020,ezenkwu2015}.
 
-\subsection{Estrutura dos grupos}
-A Fig.~\ref{fig:pca} mostra os grupos projetados nas duas primeiras componentes principais, que ret\'em $77{,}6\%$ da vari\^ancia total ($44{,}3\%$ e $33{,}3\%$). Os grupos aparecem bem delimitados, com centroides distantes entre si, o que corrobora a coes\~ao indicada pela silhueta de $0{,}42$ obtida em $k=5$.
-
-\begin{figure}[t]
+% Figura 3
+\begin{figure}[ht]
 \centering
 \includegraphics[width=0.82\columnwidth]{figuras/fig_pca.png}
 \caption{Grupos no espa\c{c}o das duas primeiras componentes principais (PCA), com centroides destacados. Figura elaborada pelos autores.}
 \label{fig:pca}
 \end{figure}
 
+\subsection{Estrutura dos grupos}
+A Fig.~\ref{fig:pca} mostra os grupos projetados nas duas primeiras componentes principais, que ret\'em $77{,}6\%$ da vari\^ancia total ($44{,}3\%$ e $33{,}3\%$). Os grupos aparecem bem delimitados, com centroides distantes entre si, o que corrobora a coes\~ao indicada pela silhueta de $0{,}42$ obtida em $k=5$.
+
 \subsection{Personas acion\'aveis}
 A Tabela~\ref{tab:persona} traduz cada centroide em uma persona com recomenda\c{c}\~ao de marketing. O sistema distingue, por exemplo, clientes de alta renda com alto gasto (alvo de programas \textit{premium}) de clientes de alta renda com baixo gasto (alvo de campanhas de convers\~ao), perfis que exigem estrat\'egias opostas apesar de renda semelhante.
 
+% Tabela II
 \begin{table*}[t]
 \caption{Personas geradas a partir dos centroides ($k=5$). Valores m\'edios em escala original.}
 \label{tab:persona}
