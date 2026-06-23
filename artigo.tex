@@ -18,9 +18,29 @@
 \title{Um Sistema de Segmenta\c{c}\~ao de Clientes de Shopping baseado em K-Means com Sele\c{c}\~ao Criteriosa de Grupos e Gera\c{c}\~ao de Personas Acion\'aveis}
 
 \author{
-\IEEEauthorblockN{Grupo --- IMD0029}
+\IEEEauthorblockN{Enock Gomes Neto}
 \IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
-\textit{Instituto Metr\'ople Digital (IMD), UFRN}\\
+\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+Natal/RN, Brasil}
+\and
+\IEEEauthorblockN{Chistian Daniel Pereira da Silva}
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
+\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+Natal/RN, Brasil}
+\and
+\IEEEauthorblockN{Vitor Fraifer Palhano dos Anjos}
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
+\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+Natal/RN, Brasil}
+\and
+\IEEEauthorblockN{Glauco Ezequiel de Sousa Gon\c{c}alves}
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
+\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
+Natal/RN, Brasil}
+\and
+\IEEEauthorblockN{Esdras Felipe Chaves Pinto Nascimento e Silva}
+\IEEEauthorblockA{\textit{Bacharelado em Tecnologia da Informa\c{c}\~ao} \\
+\textit{Instituto Metr\'opole Digital (IMD), UFRN}\\
 Natal/RN, Brasil}
 }
 
@@ -69,7 +89,7 @@ J = \sum_{i=1}^{n} \min_{\mu_j \in C} \lVert x_i - \mu_j \rVert^2,
 onde $x_i$ \'e a $i$-\'esima amostra e $\mu_j$ o centroide do grupo $C_j$. Para escolher $k$, varia-se $k \in \{2,\dots,10\}$ e, para cada valor, calculam-se: a in\'ercia (cotovelo), o coeficiente de silhueta~\cite{rousseeuw1987} e o \'indice de Calinski-Harabasz~\cite{calinski1974}. A decis\~ao final pondera os tr\^es crit\'erios: quando convergem, a escolha ganha confian\c{c}a; quando divergem, a diverg\^encia \'e analisada \`a luz da interpretabilidade dos grupos.
 
 \subsection{Agrupamento e visualiza\c{c}\~ao}
-Definido $k$, executa-se o K-Means com 50 inicializa\c{c}\~oes (\textit{k-means++}) e semente fixa para reprodutibilidade. Para visualizar os grupos, projeta-se o espa\c{c}o padronizado de tr\^es dimens\~oes em duas componentes principais via PCA~\cite{jolliffe2002}.
+Definido $k$, executa-se o K-Means com 50 inicializa\c{c}\~oes (\textit{k-means++}) e semente fixa para reprodutibilidade. Durante a varredura de $k \in \{2,\dots,10\}$, usam-se 20 inicializa\c{c}\~oes por valor (equil\'ibrio entre custo computacional e estabilidade); o modelo final adota 50 para maximizar a qualidade do resultado escolhido. Para visualizar os grupos, projeta-se o espa\c{c}o padronizado de tr\^es dimens\~oes em duas componentes principais via PCA~\cite{jolliffe2002}.
 
 \subsection{Gera\c{c}\~ao de personas}
 Cada grupo \'e caracterizado pelas m\'edias de seus atributos (centroide em escala original). A partir desse perfil, o sistema atribui um nome descritivo e uma recomenda\c{c}\~ao de marketing, traduzindo o resultado estat\'istico em a\c{c}\~ao de neg\'ocio (p.\,ex., alta renda e alto gasto $\rightarrow$ programa \textit{premium}).
@@ -81,7 +101,7 @@ O sistema foi implementado em Python com \textit{scikit-learn}~\cite{pedregosa20
 O experimento principal consistiu em executar o \textit{pipeline} completo sobre o conjunto de dados e avaliar os tr\^es crit\'erios de sele\c{c}\~ao de $k$. A Tabela~\ref{tab:crit} consolida os valores obtidos; a Fig.~\ref{fig:crit} mostra as curvas correspondentes. Em seguida, fixou-se $k$ e analisou-se a separa\c{c}\~ao dos grupos no espa\c{c}o PCA e os perfis resultantes.
 
 \begin{table}[t]
-\caption{Crit\'erios de sele\c{c}\~ao de $k$ (valores em negrito indicam o \'otimo de cada crit\'erio).}
+\caption{Crit\'erios de sele\c{c}\~ao de $k$ (valores em negrito indicam o \'otimo de cada crit\'erio: cotovelo em $k=5$, silhueta e Calinski-Harabasz em $k=6$).}
 \label{tab:crit}
 \centering
 \small
@@ -92,7 +112,7 @@ $k$ & In\'ercia (WCSS) & Silhueta & Calinski-Harabasz \\
 2 & 389{,}39 & 0{,}3355 & 107{,}10 \\
 3 & 295{,}21 & 0{,}3578 & 101{,}69 \\
 4 & 205{,}23 & 0{,}4040 & 125{,}68 \\
-5 & 168{,}25 & 0{,}4166 & 125{,}10 \\
+5 & \textbf{168{,}25} & 0{,}4166 & 125{,}10 \\
 6 & 133{,}87 & \textbf{0{,}4274} & \textbf{135{,}10} \\
 7 & 117{,}01 & 0{,}4172 & 132{,}77 \\
 8 & 103{,}83 & 0{,}4087 & 131{,}07 \\
@@ -111,10 +131,10 @@ $k$ & In\'ercia (WCSS) & Silhueta & Calinski-Harabasz \\
 
 \section{Resultados e Discuss\~ao}
 \subsection{Escolha de $k$ e diverg\^encia entre crit\'erios}
-Os crit\'erios n\~ao foram un\^animes. O m\'etodo do cotovelo (Fig.~\ref{fig:crit}a) exibe inflex\~ao clara em torno de $k=5$, ponto a partir do qual a redu\c{c}\~ao da in\'ercia desacelera. J\'a a silhueta e o \'indice Calinski-Harabasz atingem m\'aximo em $k=6$ (Tabela~\ref{tab:crit}), embora a diferen\c{c}a para $k=5$ seja pequena (silhueta $0{,}4274$ contra $0{,}4166$). Trata-se justamente do cen\'ario de \textit{diverg\^encia} previsto no projeto: optou-se por $k=5$, pois o ganho marginal em $k=6$ \'e modesto e os cinco grupos resultantes possuem interpreta\c{c}\~ao de neg\'ocio mais n\'itida, ao passo que o sexto grupo tende a subdividir um perfil j\'a coeso. Essa escolha privilegia a parcim\^onia e a acionabilidade sem perda relevante de qualidade num\'erica.
+Os crit\'erios n\~ao foram un\^animes. O m\'etodo do cotovelo (Fig.~\ref{fig:crit}a) exibe inflex\~ao clara em torno de $k=5$, ponto a partir do qual a redu\c{c}\~ao da in\'ercia desacelera. J\'a a silhueta e o \'indice Calinski-Harabasz atingem m\'aximo em $k=6$ (Tabela~\ref{tab:crit}), embora a diferen\c{c}a para $k=5$ seja pequena (silhueta $0{,}4274$ contra $0{,}4166$). Trata-se justamente do cen\'ario de \textit{diverg\^encia} previsto no projeto: optou-se por $k=5$, pois o ganho marginal em $k=6$ \'e modesto e os cinco grupos resultantes possuem interpreta\c{c}\~ao de neg\'ocio mais n\'itida, ao passo que o sexto grupo tende a subdividir um perfil j\'a coeso. Essa escolha privilegia a parcim\^onia e a acionabilidade sem perda relevante de qualidade num\'erica. Em termos comparativos, o coeficiente de silhueta obtido ($0{,}42$ para $k=5$; $0{,}43$ para $k=6$) enquadra-se na faixa \textit{razo\'avel} da escala de Rousseeuw~\cite{rousseeuw1987}, que considera valores entre $0{,}41$ e $0{,}60$ indicativos de estrutura moderada a boa --- resultado alinhado com trabalhos que aplicam K-Means a dados demogr\'aficos e comportamentais de escala similar~\cite{sinaga2020,ezenkwu2015}.
 
 \subsection{Estrutura dos grupos}
-A Fig.~\ref{fig:pca} mostra os grupos projetados nas duas primeiras componentes principais, que retêm $77{,}6\%$ da vari\^ancia total ($44{,}3\%$ e $33{,}3\%$). Os grupos aparecem bem delimitados, com centroides distantes entre si, o que corrobora a coes\~ao indicada pela silhueta de $0{,}42$ obtida em $k=5$.
+A Fig.~\ref{fig:pca} mostra os grupos projetados nas duas primeiras componentes principais, que ret\'em $77{,}6\%$ da vari\^ancia total ($44{,}3\%$ e $33{,}3\%$). Os grupos aparecem bem delimitados, com centroides distantes entre si, o que corrobora a coes\~ao indicada pela silhueta de $0{,}42$ obtida em $k=5$.
 
 \begin{figure}[t]
 \centering
@@ -156,13 +176,15 @@ Apresentou-se um sistema de segmenta\c{c}\~ao de clientes estruturado como \text
 \bibitem{calinski1974} T. Cali\'nski and J. Harabasz, ``A dendrite method for cluster analysis,'' \textit{Commun. Statist.}, vol. 3, no. 1, pp. 1--27, 1974.
 \bibitem{jolliffe2002} I. T. Jolliffe, \textit{Principal Component Analysis}, 2nd ed. New York: Springer, 2002.
 \bibitem{pedregosa2011} F. Pedregosa \textit{et al.}, ``Scikit-learn: Machine learning in Python,'' \textit{J. Mach. Learn. Res.}, vol. 12, pp. 2825--2830, 2011.
+\bibitem{sinaga2020} K. P. Sinaga and M.-S. Yang, ``Unsupervised K-means clustering algorithm,'' \textit{IEEE Access}, vol. 8, pp. 80436--80451, 2020.
+\bibitem{ezenkwu2015} C. P. Ezenkwu, S. Ozuomba, and C. Kalu, ``Application of K-Means algorithm for efficient customer segmentation: A strategy for targeted customer services,'' \textit{Int. J. Adv. Res. Artif. Intell.}, vol. 4, no. 10, pp. 40--44, 2015.
 \end{thebibliography}
 
 \section*{Anexo --- Declara\c{c}\~ao de Uso de Intelig\^encia Artificial}
 \textbf{Ferramenta utilizada:} assistente de IA baseado em modelo de linguagem (Claude, Anthropic).
 
-\textbf{Finalidade do uso:} apoio \`a estrutura\c{c}\~ao textual do artigo, revis\~ao de escrita acad\^emica e aux\'ilio na organiza\c{c}\~ao do \textit{pipeline} experimental.
+\textbf{Finalidade do uso:} revis\~ao gramatical e ortogr\'afica do texto redigido pelos autores, organiza\c{c}\~ao de ideias e aux\'ilio no c\'odigo Python do \textit{pipeline} experimental.
 
-\textbf{Forma de utiliza\c{c}\~ao:} a ferramenta foi empregada na reda\c{c}\~ao e revis\~ao do texto e na gera\c{c}\~ao do c\'odigo do experimento, que foi executado e verificado pelos autores. Todos os resultados num\'ericos (Tabelas~\ref{tab:crit} e \ref{tab:persona}) e as figuras foram produzidos pela execu\c{c}\~ao do c\'odigo sobre o conjunto de dados real e conferidos pelo grupo. Os diagramas e gr\'aficos (Figs.~\ref{fig:arch}--\ref{fig:pca}) foram gerados programaticamente com a biblioteca Matplotlib, possuindo legenda e numera\c{c}\~ao; o conte\'udo conceitual associado est\'a referenciado na bibliografia. A decis\~ao metodol\'ogica final e a interpreta\c{c}\~ao dos resultados s\~ao de responsabilidade dos autores.
+\textbf{Forma de utiliza\c{c}\~ao:} o texto do artigo foi elaborado pelos integrantes do grupo; a ferramenta foi utilizada para revis\~ao e sugest\~oes de melhoria de escrita, sem gera\c{c}\~ao autom\'atica de conte\'udo. No c\'odigo, a IA auxiliou na organiza\c{c}\~ao do \textit{pipeline}, que foi executado e verificado pelos autores. Todos os resultados num\'ericos (Tabelas~\ref{tab:crit} e \ref{tab:persona}) e as figuras foram produzidos pela execu\c{c}\~ao do c\'odigo sobre o conjunto de dados real e conferidos pelo grupo. Os diagramas e gr\'aficos (Figs.~\ref{fig:arch}--\ref{fig:pca}) foram gerados programaticamente com a biblioteca Matplotlib, possuindo legenda e numera\c{c}\~ao; o conte\'udo conceitual associado est\'a referenciado na bibliografia. A decis\~ao metodol\'ogica final e a interpreta\c{c}\~ao dos resultados s\~ao de responsabilidade dos autores.
 
 \end{document}
