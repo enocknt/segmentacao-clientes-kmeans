@@ -11,7 +11,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[brazil]{babel}
 \usepackage{booktabs}
-\usepackage{url}
+\usepackage[hidelinks]{hyperref}
 \usepackage{stfloats}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
@@ -98,7 +98,7 @@ O sistema foi concebido como um \textit{pipeline} que transforma dados brutos de
 % Figura I -- arquitetura, largura dupla (item 3)
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{figuras/fig_arch.png}
+\includegraphics[width=\textwidth]{figures/fig_arch.png}
 \caption{Arquitetura do sistema de segmenta\c{c}\~ao, do dado bruto do cliente at\'e a sa\'ida acion\'avel. Diagrama elaborado pelos autores (Matplotlib).}
 \label{fig:arch}
 \end{figure*}
@@ -131,7 +131,7 @@ em que $x_i$ \'e a $i$-\'esima amostra e $\mu_j$ \'e o centroide do grupo $C_j$.
 % Figura do algoritmo K-Means (item 5)
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{figuras/fig_kmeans.png}
+\includegraphics[width=\columnwidth]{figures/fig_kmeans.png}
 \caption{Funcionamento do K-Means em dados ilustrativos: (a) centroides iniciais, (b) atribui\c{c}\~ao de cada ponto ao centroide mais pr\'oximo, (c) atualiza\c{c}\~ao dos centroides para a m\'edia dos pontos (setas indicam o deslocamento) e (d) configura\c{c}\~ao ap\'os a converg\^encia. Figura elaborada pelos autores.}
 \label{fig:kmeans}
 \end{figure}
@@ -220,21 +220,21 @@ Grupo & Persona & Idade & Renda (k\$) & Gasto & $N$ & Recomenda\c{c}\~ao de mark
 % Figuras dos critérios, separadas (item 4)
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.78\columnwidth]{figuras/fig_elbow.png}
+\includegraphics[width=0.78\columnwidth]{figures/fig_elbow.png}
 \caption{M\'etodo do cotovelo. A redu\c{c}\~ao da in\'ercia perde ritmo a partir de $k=5$, ponto destacado pela linha tracejada. Figura elaborada pelos autores.}
 \label{fig:elbow}
 \end{figure}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.78\columnwidth]{figuras/fig_silhouette.png}
+\includegraphics[width=0.78\columnwidth]{figures/fig_silhouette.png}
 \caption{Coeficiente de silhueta em fun\c{c}\~ao de $k$. O valor m\'aximo ocorre em $k=6$, com $k=5$ bastante pr\'oximo. Figura elaborada pelos autores.}
 \label{fig:silhouette}
 \end{figure}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.78\columnwidth]{figuras/fig_ch.png}
+\includegraphics[width=0.78\columnwidth]{figures/fig_ch.png}
 \caption{\'Indice de Calinski-Harabasz em fun\c{c}\~ao de $k$, com m\'aximo em $k=6$. Figura elaborada pelos autores.}
 \label{fig:ch}
 \end{figure}
@@ -251,7 +251,7 @@ A Fig.~\ref{fig:pca} apresenta os grupos projetados nas duas primeiras component
 % Figura PCA
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.82\columnwidth]{figuras/fig_pca.png}
+\includegraphics[width=0.82\columnwidth]{figures/fig_pca.png}
 \caption{Grupos no espa\c{c}o das duas primeiras componentes principais (PCA), com os centroides destacados. Figura elaborada pelos autores.}
 \label{fig:pca}
 \end{figure}

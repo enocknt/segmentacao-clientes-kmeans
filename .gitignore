@@ -14,7 +14,7 @@
 *.snm
 *.vrb
 
-# PDF gerado (descomente se NÃO quiser versionar o PDF compilado)
+# PDF gerado
 # *.pdf
 
 # Python
