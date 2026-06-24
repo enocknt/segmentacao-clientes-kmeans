@@ -3,6 +3,7 @@
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
+\usepackage{algorithm}
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
@@ -11,6 +12,7 @@
 \usepackage[brazil]{babel}
 \usepackage{booktabs}
 \usepackage{url}
+\usepackage{stfloats}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \makeatletter
@@ -23,7 +25,7 @@
 
 \begin{document}
 
-\title{Um Sistema de Segmenta\c{c}\~ao de Clientes de Shopping baseado em K-Means com Sele\c{c}\~ao Criteriosa de Grupos e Gera\c{c}\~ao de Personas Acion\'aveis}
+\title{Um Sistema de Segmenta\c{c}\~ao de Clientes de Shopping baseado em K-Means com Sele\c{c}\~ao Criteriosa de Grupos e Gera\c{c}\~ao de Personas Acion\'aveis\thanks{O c\'odigo-fonte e os materiais para reprodu\c{c}\~ao deste trabalho est\~ao dispon\'iveis em \protect\url{https://github.com/enocknt/segmentacao-clientes-kmeans}.}}
 
 \author{
 \IEEEauthorblockN{Chistian Daniel Pereira da Silva}
@@ -64,7 +66,7 @@ Natal/RN, Brasil}
 \maketitle
 
 \begin{abstract}
-A segmenta\c{c}\~ao de clientes \'e uma tarefa central no varejo, pois permite direcionar a\c{c}\~oes de marketing a grupos com comportamentos de consumo distintos. Este trabalho apresenta um \textit{sistema} completo de segmenta\c{c}\~ao --- e n\~ao apenas a valida\c{c}\~ao de um conjunto de dados --- estruturado como um \textit{pipeline} que recebe atributos demogr\'aficos e comportamentais de clientes e produz personas acion\'aveis. O n\'ucleo do sistema \'e o algoritmo K-Means. Duas contribui\c{c}\~oes t\'ecnicas s\~ao destacadas: (i) a escolha do n\'umero de grupos $k$ combinando tr\^es crit\'erios independentes --- m\'etodo do cotovelo, coeficiente de silhueta e \'indice Calinski-Harabasz --- de modo que a concord\^ancia gere confian\c{c}a e a diverg\^encia se torne objeto de discuss\~ao; e (ii) a tradu\c{c}\~ao de cada grupo em uma persona com recomenda\c{c}\~ao de marketing. Aplicado ao \textit{Mall Customer Segmentation Dataset} (200 clientes), o sistema identificou cinco perfis interpret\'aveis, com coeficiente de silhueta de $0{,}42$, e gerou recomenda\c{c}\~oes de neg\'ocio coerentes com a literatura.
+A segmenta\c{c}\~ao de clientes \'e uma tarefa central no varejo, pois permite direcionar a\c{c}\~oes de marketing a grupos com comportamentos de consumo distintos. Este trabalho apresenta um \textit{sistema} completo de segmenta\c{c}\~ao, e n\~ao apenas a valida\c{c}\~ao de um conjunto de dados, estruturado como um \textit{pipeline} que recebe atributos demogr\'aficos e comportamentais de clientes e produz personas acion\'aveis. O n\'ucleo do sistema \'e o algoritmo K-Means. Destacam-se duas contribui\c{c}\~oes t\'ecnicas. A primeira \'e a escolha do n\'umero de grupos $k$ a partir de tr\^es crit\'erios independentes (m\'etodo do cotovelo, coeficiente de silhueta e \'indice Calinski-Harabasz), de forma que a concord\^ancia entre eles refor\c{c}a a confian\c{c}a na escolha e a diverg\^encia abre espa\c{c}o para discuss\~ao. A segunda \'e a tradu\c{c}\~ao de cada grupo em uma persona com recomenda\c{c}\~ao de marketing. Aplicado ao \textit{Mall Customer Segmentation Dataset}, com 200 clientes, o sistema identificou cinco perfis interpret\'aveis, com coeficiente de silhueta de $0{,}42$, e gerou recomenda\c{c}\~oes de neg\'ocio coerentes com a literatura.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -72,55 +74,110 @@ aprendizado n\~ao-supervisionado, K-Means, segmenta\c{c}\~ao de clientes, silhue
 \end{IEEEkeywords}
 
 \section{Introdu\c{c}\~ao}
-A capacidade de compreender o comportamento de compra dos consumidores tornou-se um diferencial competitivo para o varejo. Em vez de tratar a base de clientes como um todo homog\^eneo, as empresas buscam dividi-la em grupos com caracter\'isticas semelhantes, pr\'atica conhecida como \textit{segmenta\c{c}\~ao de clientes}. Cada segmento pode ent\~ao receber estrat\'egias de marketing espec\'ificas, o que aumenta a efetividade das campanhas e a satisfa\c{c}\~ao do cliente.
+Compreender o comportamento de compra dos consumidores tornou-se um diferencial competitivo para o varejo. Em vez de tratar a base de clientes como um bloco homog\^eneo, as empresas procuram dividi-la em grupos de caracter\'isticas semelhantes, pr\'atica conhecida como \textit{segmenta\c{c}\~ao de clientes}. Com os grupos em m\~aos, cada segmento pode receber estrat\'egias de marketing pr\'oprias, o que tende a aumentar a efetividade das campanhas e a satisfa\c{c}\~ao do cliente.
 
-Como na pr\'atica n\~ao se conhecem previamente os r\'otulos dos segmentos, o problema \'e naturalmente abordado por t\'ecnicas de \textit{aprendizado de m\'aquina n\~ao-supervisionado}, em particular por algoritmos de agrupamento (\textit{clustering}). O K-Means~\cite{macqueen1967} \'e o m\'etodo mais empregado nesse contexto por sua simplicidade, efici\^encia e interpretabilidade.
+Na pr\'atica, os r\'otulos dos segmentos n\~ao s\~ao conhecidos de antem\~ao. Por isso, o problema costuma ser tratado com t\'ecnicas de \textit{aprendizado de m\'aquina n\~ao-supervisionado}, em especial por algoritmos de agrupamento (\textit{clustering}). O K-Means~\cite{macqueen1967} \'e o m\'etodo mais usado nesse cen\'ario, gra\c{c}as \`a simplicidade, \`a efici\^encia e \`a facilidade de interpreta\c{c}\~ao dos resultados.
 
-Entretanto, dois desafios pr\'aticos costumam ser subestimados. O primeiro \'e a defini\c{c}\~ao do n\'umero de grupos $k$, par\^ametro que o K-Means n\~ao infere automaticamente e que afeta diretamente a qualidade da solu\c{c}\~ao. O segundo \'e a transforma\c{c}\~ao dos grupos obtidos em informa\c{c}\~ao \'util para o neg\'ocio: um r\'otulo num\'erico de \textit{cluster}, isoladamente, n\~ao orienta a\c{c}\~oes.
+Dois desafios pr\'aticos, por\'em, costumam ser subestimados. O primeiro \'e definir o n\'umero de grupos $k$, par\^ametro que o K-Means n\~ao descobre sozinho e que influencia diretamente a qualidade da solu\c{c}\~ao. O segundo \'e transformar os grupos obtidos em informa\c{c}\~ao \'util para o neg\'ocio, j\'a que um r\'otulo num\'erico de \textit{cluster}, sozinho, n\~ao indica que a\c{c}\~ao tomar.
 
-Este trabalho aborda ambos os desafios propondo um \textit{sistema} de segmenta\c{c}\~ao com \textit{pipeline} bem definido. As contribui\c{c}\~oes s\~ao: (i) a sele\c{c}\~ao criteriosa de $k$ por meio da combina\c{c}\~ao de tr\^es crit\'erios complementares; e (ii) a gera\c{c}\~ao autom\'atica de personas com recomenda\c{c}\~oes de marketing a partir dos centroides. O sistema foi avaliado sobre o \textit{Mall Customer Segmentation Dataset}.
+Este trabalho enfrenta os dois desafios com um \textit{sistema} de segmenta\c{c}\~ao apoiado em um \textit{pipeline} bem definido. As contribui\c{c}\~oes s\~ao a sele\c{c}\~ao criteriosa de $k$, que combina tr\^es crit\'erios complementares, e a gera\c{c}\~ao autom\'atica de personas com recomenda\c{c}\~oes de marketing a partir dos centroides. A avalia\c{c}\~ao foi feita sobre o \textit{Mall Customer Segmentation Dataset}.
 
 \section{Trabalhos Relacionados}
-O K-Means foi formalizado por MacQueen~\cite{macqueen1967} e permanece, d\'ecadas depois, um dos algoritmos de agrupamento mais utilizados, sobretudo em aplica\c{c}\~oes de marketing e an\'alise de clientes. Para a escolha de $k$, a literatura oferece crit\'erios distintos: o m\'etodo do cotovelo analisa a redu\c{c}\~ao da in\'ercia (soma das dist\^ancias intra-grupo); o coeficiente de silhueta~\cite{rousseeuw1987} mede o qu\~ao bem cada ponto se ajusta ao seu grupo em rela\c{c}\~ao ao grupo vizinho mais pr\'oximo; e o \'indice de Calinski-Harabasz~\cite{calinski1974} avalia a raz\~ao entre a dispers\~ao entre grupos e a dispers\~ao interna. Cada crit\'erio captura um aspecto diferente da qualidade do agrupamento, o que motiva seu uso conjunto.
+O K-Means foi formalizado por MacQueen~\cite{macqueen1967} e, d\'ecadas depois, segue entre os algoritmos de agrupamento mais utilizados, sobretudo em marketing e an\'alise de clientes. Para escolher $k$, a literatura oferece crit\'erios com focos diferentes. O m\'etodo do cotovelo observa a redu\c{c}\~ao da in\'ercia, isto \'e, da soma das dist\^ancias internas aos grupos. O coeficiente de silhueta~\cite{rousseeuw1987} mede o qu\~ao bem cada ponto se encaixa no seu grupo em compara\c{c}\~ao com o grupo vizinho mais pr\'oximo. J\'a o \'indice de Calinski-Harabasz~\cite{calinski1974} compara a dispers\~ao entre grupos com a dispers\~ao interna. Como cada crit\'erio enxerga um aspecto distinto da qualidade do agrupamento, faz sentido us\'a-los em conjunto.
 
-Para visualiza\c{c}\~ao de dados de alta dimens\~ao, a An\'alise de Componentes Principais (PCA)~\cite{jolliffe2002} \'e amplamente adotada, projetando os dados em poucas dimens\~oes que preservam o m\'aximo de vari\^ancia. As implementa\c{c}\~oes utilizadas neste trabalho prov\^em da biblioteca \textit{scikit-learn}~\cite{pedregosa2011}. Em compara\c{c}\~ao com trabalhos que se limitam a aplicar o K-Means e reportar m\'etricas, o presente sistema agrega uma etapa de decis\~ao multicrit\'erio para $k$ e uma camada de sa\'ida orientada ao neg\'ocio.
+Para visualizar dados de alta dimens\~ao, a An\'alise de Componentes Principais (PCA)~\cite{jolliffe2002} \'e largamente empregada, pois projeta os dados em poucas dimens\~oes preservando o m\'aximo de vari\^ancia. Neste trabalho, as implementa\c{c}\~oes v\^em da biblioteca \textit{scikit-learn}~\cite{pedregosa2011}. Diferentemente de estudos que apenas aplicam o K-Means e relatam m\'etricas, o sistema aqui proposto acrescenta uma etapa de decis\~ao multicrit\'erio para $k$ e uma camada de sa\'ida voltada ao neg\'ocio.
 
-% Figura I
-\begin{figure}[ht]
-\centering
-\includegraphics[width=\columnwidth]{figuras/fig_arch.png}
-\caption{Arquitetura do sistema de segmenta\c{c}\~ao. Diagrama elaborado pelos autores (Matplotlib).}
-\label{fig:arch}
-\end{figure}
+\subsection{Por que K-Means}
+O K-Means n\~ao \'e a \'unica op\c{c}\~ao de agrupamento. O DBSCAN forma grupos a partir da densidade dos pontos, dispensa a defini\c{c}\~ao pr\'evia de $k$ e identifica \textit{outliers} de forma natural, mas seu desempenho depende muito dos par\^ametros de vizinhan\c{c}a ($\varepsilon$ e n\'umero m\'inimo de pontos) e tende a sofrer quando os grupos t\^em densidades bem diferentes. J\'a o agrupamento hier\'arquico produz um dendrograma que revela a estrutura em v\'arios n\'iveis e tamb\'em n\~ao exige $k$ de antem\~ao, por\'em tem custo computacional mais alto e n\~ao escala t\~ao bem para bases maiores.
+
+Para o problema tratado aqui, o K-Means re\'une as vantagens que mais importam: os atributos de cliente formam grupos relativamente compactos e de tamanho compar\'avel, situa\c{c}\~ao em que o m\'etodo costuma ir bem; o resultado \'e um centroide por grupo, o que se traduz com facilidade em uma persona; e o baixo custo permite repetir o algoritmo para v\'arios valores de $k$ durante a sele\c{c}\~ao. A aus\^encia de defini\c{c}\~ao autom\'atica de $k$, principal limita\c{c}\~ao do m\'etodo, \'e justamente o que a etapa multicrit\'erio descrita adiante busca contornar.
 
 \section{Metodologia}
-O sistema proposto foi concebido como um \textit{pipeline} de processamento que transforma dados brutos de clientes em personas acion\'aveis. A Fig.~\ref{fig:arch} apresenta a arquitetura, composta por seis est\'agios.
+O sistema foi concebido como um \textit{pipeline} que transforma dados brutos de clientes em personas acion\'aveis. A Fig.~\ref{fig:arch} mostra a arquitetura, formada por seis est\'agios.
+
+% Figura I -- arquitetura, largura dupla (item 3)
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figuras/fig_arch.png}
+\caption{Arquitetura do sistema de segmenta\c{c}\~ao, do dado bruto do cliente at\'e a sa\'ida acion\'avel. Diagrama elaborado pelos autores (Matplotlib).}
+\label{fig:arch}
+\end{figure*}
 
 \subsection{Entrada e pr\'e-processamento}
-A entrada \'e composta por tr\^es atributos por cliente: idade, renda anual e \textit{spending score} (\'indice de gasto de 1 a 100). Como esses atributos possuem escalas distintas e o K-Means se baseia em dist\^ancia euclidiana, aplica-se padroniza\c{c}\~ao \textit{z-score}, de modo que cada atributo passe a ter m\'edia zero e desvio-padr\~ao unit\'ario, evitando que a vari\'avel de maior amplitude domine o agrupamento.
+A entrada re\'une tr\^es atributos por cliente: idade, renda anual e \textit{spending score} (\'indice de gasto de 1 a 100). Esses atributos est\~ao em escalas diferentes, e o K-Means se baseia em dist\^ancia euclidiana. Para que a vari\'avel de maior amplitude n\~ao domine o agrupamento, aplica-se a padroniza\c{c}\~ao \textit{z-score}, deixando cada atributo com m\'edia zero e desvio-padr\~ao unit\'ario.
 
-\subsection{Sele\c{c}\~ao do n\'umero de grupos}
-O K-Means minimiza a in\'ercia
+\subsection{O algoritmo K-Means}
+O K-Means particiona as amostras em $k$ grupos buscando minimizar a in\'ercia,
 \begin{equation}
 J = \sum_{i=1}^{n} \min_{\mu_j \in C} \lVert x_i - \mu_j \rVert^2,
 \end{equation}
-onde $x_i$ \'e a $i$-\'esima amostra e $\mu_j$ o centroide do grupo $C_j$. Para escolher $k$, varia-se $k \in \{2,\dots,10\}$ e, para cada valor, calculam-se: a in\'ercia (cotovelo), o coeficiente de silhueta~\cite{rousseeuw1987} e o \'indice de Calinski-Harabasz~\cite{calinski1974}. A decis\~ao final pondera os tr\^es crit\'erios: quando convergem, a escolha ganha confian\c{c}a; quando divergem, a diverg\^encia \'e analisada \`a luz da interpretabilidade dos grupos.
+em que $x_i$ \'e a $i$-\'esima amostra e $\mu_j$ \'e o centroide do grupo $C_j$. O algoritmo parte de centroides iniciais e repete dois passos at\'e estabilizar: atribui cada ponto ao centroide mais pr\'oximo e, em seguida, recalcula cada centroide como a m\'edia dos pontos que lhe foram atribu\'idos. O Algoritmo~\ref{alg:kmeans} resume esse procedimento, e a Fig.~\ref{fig:kmeans} ilustra esse processo, da posi\c{c}\~ao inicial dos centroides at\'e a converg\^encia, quando as atribui\c{c}\~oes deixam de mudar.
+
+\begin{algorithm}[t]
+\caption{K-Means}
+\label{alg:kmeans}
+\begin{algorithmic}[1]
+\REQUIRE dados $X = \{x_1,\dots,x_n\}$, n\'umero de grupos $k$
+\ENSURE atribui\c{c}\~oes de grupo e centroides $\{\mu_1,\dots,\mu_k\}$
+\STATE inicializar $k$ centroides (\textit{k-means++})
+\REPEAT
+  \STATE \textbf{Atribui\c{c}\~ao:} associar cada $x_i$ ao centroide $\mu_j$ mais pr\'oximo
+  \STATE \textbf{Atualiza\c{c}\~ao:} recalcular cada $\mu_j$ como a m\'edia dos pontos do grupo $C_j$
+\UNTIL{os centroides n\~ao mudarem (converg\^encia)}
+\RETURN atribui\c{c}\~oes e centroides
+\end{algorithmic}
+\end{algorithm}
+
+% Figura do algoritmo K-Means (item 5)
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figuras/fig_kmeans.png}
+\caption{Funcionamento do K-Means em dados ilustrativos: (a) centroides iniciais, (b) atribui\c{c}\~ao de cada ponto ao centroide mais pr\'oximo, (c) atualiza\c{c}\~ao dos centroides para a m\'edia dos pontos (setas indicam o deslocamento) e (d) configura\c{c}\~ao ap\'os a converg\^encia. Figura elaborada pelos autores.}
+\label{fig:kmeans}
+\end{figure}
+
+\subsection{Sele\c{c}\~ao do n\'umero de grupos}
+A escolha de $k$ varre o intervalo $k \in \{2,\dots,10\}$. Para cada valor, calculam-se a in\'ercia (cotovelo), o coeficiente de silhueta~\cite{rousseeuw1987} e o \'indice de Calinski-Harabasz~\cite{calinski1974}. A decis\~ao final pondera os tr\^es crit\'erios: quando eles apontam para o mesmo $k$, a escolha ganha confian\c{c}a; quando discordam, a diverg\^encia \'e examinada \`a luz da interpretabilidade dos grupos.
 
 \subsection{Agrupamento e visualiza\c{c}\~ao}
-Definido $k$, executa-se o K-Means com 50 inicializa\c{c}\~oes (\textit{k-means++}) e semente fixa para reprodutibilidade. Durante a varredura de $k \in \{2,\dots,10\}$, usam-se 20 inicializa\c{c}\~oes por valor (equil\'ibrio entre custo computacional e estabilidade); o modelo final adota 50 para maximizar a qualidade do resultado escolhido. Para visualizar os grupos, projeta-se o espa\c{c}o padronizado de tr\^es dimens\~oes em duas componentes principais via PCA~\cite{jolliffe2002}.
+Com $k$ fixado, o K-Means \'e executado com 50 inicializa\c{c}\~oes (\textit{k-means++}) e semente fixa, o que garante reprodutibilidade. Na varredura de $k$, usam-se 20 inicializa\c{c}\~oes por valor, um equil\'ibrio entre custo computacional e estabilidade; o modelo final adota 50 para refinar o resultado escolhido. Para visualizar os grupos, o espa\c{c}o padronizado de tr\^es dimens\~oes \'e projetado em duas componentes principais via PCA~\cite{jolliffe2002}.
 
 \subsection{Gera\c{c}\~ao de personas}
-Cada grupo \'e caracterizado pelas m\'edias de seus atributos (centroide em escala original). A partir desse perfil, o sistema atribui um nome descritivo e uma recomenda\c{c}\~ao de marketing, traduzindo o resultado estat\'istico em a\c{c}\~ao de neg\'ocio (p.\,ex., alta renda e alto gasto $\rightarrow$ programa \textit{premium}).
+Cada grupo \'e descrito pelas m\'edias de seus atributos, ou seja, pelo centroide em escala original. A partir desse perfil, o sistema atribui um nome descritivo e uma recomenda\c{c}\~ao de marketing, convertendo o resultado estat\'istico em uma a\c{c}\~ao de neg\'ocio. Um cliente de alta renda e alto gasto, por exemplo, aponta para um programa \textit{premium}.
 
 \subsection{Materiais}
-O sistema foi implementado em Python com \textit{scikit-learn}~\cite{pedregosa2011}, \textit{pandas} e \textit{matplotlib}. Utilizou-se o \textit{Mall Customer Segmentation Dataset}, com 200 clientes.
+O sistema foi implementado em Python, com \textit{scikit-learn}~\cite{pedregosa2011}, \textit{pandas} e \textit{matplotlib}. Os experimentos usaram o \textit{Mall Customer Segmentation Dataset}, com 200 clientes.
 
 \section{Experimentos}
-O experimento principal consistiu em executar o \textit{pipeline} completo sobre o conjunto de dados e avaliar os tr\^es crit\'erios de sele\c{c}\~ao de $k$. A Tabela~\ref{tab:crit} consolida os valores obtidos; a Fig.~\ref{fig:crit} mostra as curvas correspondentes. Em seguida, fixou-se $k$ e analisou-se a separa\c{c}\~ao dos grupos no espa\c{c}o PCA e os perfis resultantes.
+\subsection{Caracteriza\c{c}\~ao do conjunto de dados}
+Antes do agrupamento, examinaram-se as distribui\c{c}\~oes dos atributos. O conjunto re\'une 200 clientes, sendo 112 do sexo feminino e 88 do masculino. A Tabela~\ref{tab:desc} resume as estat\'isticas descritivas dos tr\^es atributos usados. A idade varia de 18 a 70 anos, com m\'edia pr\'oxima de 39. A renda anual vai de 15 a 137 (em milhares), com m\'edia em torno de 61. O \textit{spending score} cobre quase toda a faixa poss\'ivel, de 1 a 99, com m\'edia de 50 e distribui\c{c}\~ao bastante espalhada (desvio-padr\~ao de 26). Essa dispers\~ao ampla em renda e gasto \'e o que torna o conjunto interessante para segmenta\c{c}\~ao: h\'a margem para perfis bem distintos, em vez de uma massa homog\^enea de clientes.
 
-% Tabela I
 \begin{table}[t]
-\caption{Crit\'erios de sele\c{c}\~ao de $k$ (valores em negrito indicam o \'otimo de cada crit\'erio: cotovelo em $k=5$, silhueta e Calinski-Harabasz em $k=6$).}
+\caption{Estat\'isticas descritivas dos atributos ($n=200$).}
+\label{tab:desc}
+\centering
+\small
+\begin{tabular}{lccc}
+\toprule
+ & Idade & Renda (k\$) & Gasto (1--100) \\
+\midrule
+M\'edia & 38{,}8 & 60{,}6 & 50{,}2 \\
+Desvio-padr\~ao & 14{,}0 & 26{,}3 & 25{,}8 \\
+M\'inimo & 18{,}0 & 15{,}0 & 1{,}0 \\
+1\textsuperscript{o} quartil & 28{,}8 & 41{,}5 & 34{,}8 \\
+Mediana & 36{,}0 & 61{,}5 & 50{,}0 \\
+3\textsuperscript{o} quartil & 49{,}0 & 78{,}0 & 73{,}0 \\
+M\'aximo & 70{,}0 & 137{,}0 & 99{,}0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Procedimento experimental}
+O experimento principal executou o \textit{pipeline} completo sobre o conjunto de dados e avaliou os tr\^es crit\'erios de sele\c{c}\~ao de $k$. A Tabela~\ref{tab:crit} re\'une os valores obtidos, e as Figs.~\ref{fig:elbow} a \ref{fig:ch} mostram as curvas de cada crit\'erio. Em seguida, com $k$ fixado, analisaram-se a separa\c{c}\~ao dos grupos no espa\c{c}o PCA e os perfis resultantes.
+
+% Tabela de critérios (numerada automaticamente)
+\begin{table}[t]
+\caption{Crit\'erios de sele\c{c}\~ao de $k$. Os valores em negrito indicam o \'otimo de cada crit\'erio: cotovelo em $k=5$; silhueta e Calinski-Harabasz em $k=6$.}
 \label{tab:crit}
 \centering
 \small
@@ -141,34 +198,8 @@ $k$ & In\'ercia (WCSS) & Silhueta & Calinski-Harabasz \\
 \end{tabular}
 \end{table}
 
-% Figura 2
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{figuras/fig_criteria.png}
-\caption{Crit\'erios para sele\c{c}\~ao de $k$: (a) cotovelo, (b) silhueta e (c) Calinski-Harabasz. Linhas tracejadas marcam pontos de interesse. Figura elaborada pelos autores.}
-\label{fig:crit}
-\end{figure}
-
-\section{Resultados e Discuss\~ao}
-\subsection{Escolha de $k$ e diverg\^encia entre crit\'erios}
-Os crit\'erios n\~ao foram un\^animes. O m\'etodo do cotovelo (Fig.~\ref{fig:crit}a) exibe inflex\~ao clara em torno de $k=5$, ponto a partir do qual a redu\c{c}\~ao da in\'ercia desacelera. J\'a a silhueta e o \'indice Calinski-Harabasz atingem m\'aximo em $k=6$ (Tabela~\ref{tab:crit}), embora a diferen\c{c}a para $k=5$ seja pequena (silhueta $0{,}4274$ contra $0{,}4166$). Trata-se justamente do cen\'ario de \textit{diverg\^encia} previsto no projeto: optou-se por $k=5$, pois o ganho marginal em $k=6$ \'e modesto e os cinco grupos resultantes possuem interpreta\c{c}\~ao de neg\'ocio mais n\'itida, ao passo que o sexto grupo tende a subdividir um perfil j\'a coeso. Essa escolha privilegia a parcim\^onia e a acionabilidade sem perda relevante de qualidade num\'erica. Em termos comparativos, o coeficiente de silhueta obtido ($0{,}42$ para $k=5$; $0{,}43$ para $k=6$) enquadra-se na faixa \textit{razo\'avel} da escala de Rousseeuw~\cite{rousseeuw1987}, que considera valores entre $0{,}41$ e $0{,}60$ indicativos de estrutura moderada a boa --- resultado alinhado com trabalhos que aplicam K-Means a dados demogr\'aficos e comportamentais de escala similar~\cite{sinaga2020,ezenkwu2015}.
-
-% Figura 3
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.82\columnwidth]{figuras/fig_pca.png}
-\caption{Grupos no espa\c{c}o das duas primeiras componentes principais (PCA), com centroides destacados. Figura elaborada pelos autores.}
-\label{fig:pca}
-\end{figure}
-
-\subsection{Estrutura dos grupos}
-A Fig.~\ref{fig:pca} mostra os grupos projetados nas duas primeiras componentes principais, que ret\'em $77{,}6\%$ da vari\^ancia total ($44{,}3\%$ e $33{,}3\%$). Os grupos aparecem bem delimitados, com centroides distantes entre si, o que corrobora a coes\~ao indicada pela silhueta de $0{,}42$ obtida em $k=5$.
-
-\subsection{Personas acion\'aveis}
-A Tabela~\ref{tab:persona} traduz cada centroide em uma persona com recomenda\c{c}\~ao de marketing. O sistema distingue, por exemplo, clientes de alta renda com alto gasto (alvo de programas \textit{premium}) de clientes de alta renda com baixo gasto (alvo de campanhas de convers\~ao), perfis que exigem estrat\'egias opostas apesar de renda semelhante.
-
-% Tabela II
-\begin{table*}[t]
+% Tabela de personas, largura dupla (numerada automaticamente)
+\begin{table*}[b]
 \caption{Personas geradas a partir dos centroides ($k=5$). Valores m\'edios em escala original.}
 \label{tab:persona}
 \centering
@@ -186,13 +217,59 @@ Grupo & Persona & Idade & Renda (k\$) & Gasto & $N$ & Recomenda\c{c}\~ao de mark
 \end{tabular}
 \end{table*}
 
+% Figuras dos critérios, separadas (item 4)
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.78\columnwidth]{figuras/fig_elbow.png}
+\caption{M\'etodo do cotovelo. A redu\c{c}\~ao da in\'ercia perde ritmo a partir de $k=5$, ponto destacado pela linha tracejada. Figura elaborada pelos autores.}
+\label{fig:elbow}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.78\columnwidth]{figuras/fig_silhouette.png}
+\caption{Coeficiente de silhueta em fun\c{c}\~ao de $k$. O valor m\'aximo ocorre em $k=6$, com $k=5$ bastante pr\'oximo. Figura elaborada pelos autores.}
+\label{fig:silhouette}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.78\columnwidth]{figuras/fig_ch.png}
+\caption{\'Indice de Calinski-Harabasz em fun\c{c}\~ao de $k$, com m\'aximo em $k=6$. Figura elaborada pelos autores.}
+\label{fig:ch}
+\end{figure}
+
+\section{Resultados e Discuss\~ao}
+\subsection{Escolha de $k$ e diverg\^encia entre crit\'erios}
+Os crit\'erios n\~ao foram un\^animes. O m\'etodo do cotovelo (Fig.~\ref{fig:elbow}) mostra uma inflex\~ao clara em torno de $k=5$, a partir da qual a in\'ercia cai mais devagar. A silhueta (Fig.~\ref{fig:silhouette}) e o \'indice Calinski-Harabasz (Fig.~\ref{fig:ch}) atingem o m\'aximo em $k=6$, embora a vantagem sobre $k=5$ seja pequena (silhueta de $0{,}4274$ contra $0{,}4166$). Esse \'e exatamente o tipo de diverg\^encia que o projeto previa. Optou-se por $k=5$, porque o ganho em $k=6$ \'e modesto e os cinco grupos t\^em leitura de neg\'ocio mais n\'itida; o sexto grupo, na pr\'atica, apenas reparte um perfil que j\'a era coeso. A escolha favorece a simplicidade e a acionabilidade sem perda relevante de qualidade num\'erica.
+
+Vale situar esse resultado na escala de Rousseeuw~\cite{rousseeuw1987}, que considera valores de silhueta entre $0{,}41$ e $0{,}60$ como ind\'icio de estrutura moderada a boa. O coeficiente obtido ($0{,}42$ em $k=5$ e $0{,}43$ em $k=6$) fica nessa faixa e acompanha o que reportam trabalhos que aplicam K-Means a dados demogr\'aficos e comportamentais de porte parecido~\cite{sinaga2020,ezenkwu2015}.
+
+\subsection{Estrutura dos grupos}
+A Fig.~\ref{fig:pca} apresenta os grupos projetados nas duas primeiras componentes principais, que preservam $77{,}6\%$ da vari\^ancia total ($44{,}3\%$ e $33{,}3\%$). Os grupos aparecem bem delimitados, com centroides afastados uns dos outros, o que confirma a coes\~ao sugerida pela silhueta de $0{,}42$ em $k=5$.
+
+% Figura PCA
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.82\columnwidth]{figuras/fig_pca.png}
+\caption{Grupos no espa\c{c}o das duas primeiras componentes principais (PCA), com os centroides destacados. Figura elaborada pelos autores.}
+\label{fig:pca}
+\end{figure}
+
+\subsection{Personas acion\'aveis}
+A Tabela~\ref{tab:persona} converte cada centroide em uma persona acompanhada de recomenda\c{c}\~ao de marketing. Para situar os perfis, vale lembrar que, no conjunto como um todo, a idade m\'edia \'e de cerca de 39 anos, a renda anual m\'edia gira em torno de 60~mil e o \textit{spending score} m\'edio fica pr\'oximo de 50.
+
+O grupo 2, \textit{Premium ativo}, re\'une os clientes mais valiosos: renda alta (m\'edia de 86) combinada com gasto elevado (81). S\~ao o p\'ublico ideal para servi\c{c}os exclusivos e \textit{cross-selling} de produtos de maior valor. O grupo 3, \textit{Conservador endinheirado}, chama aten\c{c}\~ao por ter a mesma renda alta, mas gasto baixo (19); o desafio aqui n\~ao \'e poder de compra, e sim convencer o cliente a gastar, o que pede campanhas de convers\~ao e constru\c{c}\~ao de confian\c{c}a. O contraste entre esses dois grupos refor\c{c}a a ideia central do trabalho: a renda, isolada, n\~ao basta para orientar a a\c{c}\~ao de marketing.
+
+O grupo 1, \textit{Jovem entusiasta}, \'e o mais numeroso (54 clientes) e mistura idade baixa (25 anos) com gasto acima da m\'edia, apesar de renda apenas mediana; \'e um p\'ublico de alto potencial no longo prazo, bom alvo para programas de fidelidade e engajamento digital. No extremo oposto, o grupo 0, \textit{Maduro econ\^omico}, junta a renda mais baixa (27) ao menor gasto (18), o que justifica priorizar ofertas de baixo custo sem grande investimento. Por fim, o grupo 4, \textit{P\'ublico m\'edio}, ocupa a posi\c{c}\~ao intermedi\'aria em todos os atributos e funciona como um segmento de manuten\c{c}\~ao, atendido por comunica\c{c}\~ao mais generalista.
+
 \subsection{Limita\c{c}\~oes}
-O sistema usa apenas tr\^es atributos e um conjunto de dados de pequeno porte (200 clientes). O K-Means assume grupos aproximadamente esf\'ericos e \'e sens\'ivel a \textit{outliers}. Trabalhos futuros podem incorporar mais atributos comportamentais, comparar com algoritmos baseados em densidade e validar as personas com dados reais de campanha.
+O sistema usa apenas tr\^es atributos e um conjunto de dados pequeno, com 200 clientes. Al\'em disso, o K-Means pressup\~oe grupos aproximadamente esf\'ericos e sofre influ\^encia de \textit{outliers}. Em trabalhos futuros, pretende-se incorporar mais atributos comportamentais, comparar o m\'etodo com algoritmos baseados em densidade e validar as personas com dados reais de campanha.
 
 \section{Conclus\~ao}
-Apresentou-se um sistema de segmenta\c{c}\~ao de clientes estruturado como \textit{pipeline}, cujo n\'ucleo \'e o K-Means. As duas contribui\c{c}\~oes --- sele\c{c}\~ao de $k$ por tr\^es crit\'erios e gera\c{c}\~ao de personas acion\'aveis --- mostraram-se efetivas: o sistema produziu cinco perfis interpret\'aveis (silhueta $0{,}42$) e recomenda\c{c}\~oes de marketing coerentes. O caso de diverg\^encia entre crit\'erios ($k=5$ vs.\ $k=6$) evidenciou o valor da abordagem multicrit\'erio, que combina evid\^encia num\'erica e interpretabilidade na decis\~ao final.
+Este trabalho apresentou um sistema de segmenta\c{c}\~ao de clientes organizado como \textit{pipeline} e centrado no K-Means. As duas contribui\c{c}\~oes propostas, a sele\c{c}\~ao de $k$ por tr\^es crit\'erios e a gera\c{c}\~ao de personas acion\'aveis, mostraram-se eficazes: o sistema produziu cinco perfis interpret\'aveis, com silhueta de $0{,}42$, e recomenda\c{c}\~oes de marketing coerentes. A diverg\^encia entre crit\'erios ($k=5$ contra $k=6$) refor\c{c}ou o valor da abordagem multicrit\'erio, que une evid\^encia num\'erica e interpretabilidade no momento de decidir.
 
-\clearpage 
+
 
 \begin{thebibliography}{00}
 \bibitem{macqueen1967} J. MacQueen, ``Some methods for classification and analysis of multivariate observations,'' in \textit{Proc. 5th Berkeley Symp. Math. Statist. Probab.}, vol. 1, 1967, pp. 281--297.
@@ -204,13 +281,13 @@ Apresentou-se um sistema de segmenta\c{c}\~ao de clientes estruturado como \text
 \bibitem{ezenkwu2015} C. P. Ezenkwu, S. Ozuomba, and C. Kalu, ``Application of K-Means algorithm for efficient customer segmentation: A strategy for targeted customer services,'' \textit{Int. J. Adv. Res. Artif. Intell.}, vol. 4, no. 10, pp. 40--44, 2015.
 \end{thebibliography}
 
-\newpage
+
 
 \section*{Anexo --- Declara\c{c}\~ao de Uso de Intelig\^encia Artificial}
 \textbf{Ferramenta utilizada:} assistente de IA baseado em modelo de linguagem (Claude, Anthropic).
 
 \textbf{Finalidade do uso:} revis\~ao gramatical e ortogr\'afica do texto redigido pelos autores, organiza\c{c}\~ao de ideias e aux\'ilio no c\'odigo Python do \textit{pipeline} experimental.
 
-\textbf{Forma de utiliza\c{c}\~ao:} o texto do artigo foi elaborado pelos integrantes do grupo; a ferramenta foi utilizada para revis\~ao e sugest\~oes de melhoria de escrita, sem gera\c{c}\~ao autom\'atica de conte\'udo. No c\'odigo, a IA auxiliou na organiza\c{c}\~ao do \textit{pipeline}, que foi executado e verificado pelos autores. Todos os resultados num\'ericos (Tabelas~\ref{tab:crit} e \ref{tab:persona}) e as figuras foram produzidos pela execu\c{c}\~ao do c\'odigo sobre o conjunto de dados real e conferidos pelo grupo. Os diagramas e gr\'aficos (Figs.~\ref{fig:arch}--\ref{fig:pca}) foram gerados programaticamente com a biblioteca Matplotlib, possuindo legenda e numera\c{c}\~ao; o conte\'udo conceitual associado est\'a referenciado na bibliografia. A decis\~ao metodol\'ogica final e a interpreta\c{c}\~ao dos resultados s\~ao de responsabilidade dos autores.
+\textbf{Forma de utiliza\c{c}\~ao:} o texto do artigo foi elaborado pelos integrantes do grupo; a ferramenta foi utilizada para revis\~ao e sugest\~oes de melhoria de escrita, sem gera\c{c}\~ao autom\'atica de conte\'udo. No c\'odigo, a IA auxiliou na organiza\c{c}\~ao do \textit{pipeline}, que foi executado e verificado pelos autores. Todos os resultados num\'ericos (Tabelas~\ref{tab:desc}, \ref{tab:crit} e \ref{tab:persona}) e as figuras foram produzidos pela execu\c{c}\~ao do c\'odigo sobre o conjunto de dados real e conferidos pelo grupo. Os diagramas e gr\'aficos (Figs.~\ref{fig:arch}, \ref{fig:kmeans} e \ref{fig:elbow}--\ref{fig:pca}) foram gerados programaticamente com a biblioteca Matplotlib, possuindo legenda e numera\c{c}\~ao; o conte\'udo conceitual associado est\'a referenciado na bibliografia. A decis\~ao metodol\'ogica final e a interpreta\c{c}\~ao dos resultados s\~ao de responsabilidade dos autores.
 
 \end{document}

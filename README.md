@@ -24,11 +24,15 @@ dados do cliente → pré-processamento (z-score) → seleção de k → K-Means
 ├── artigo.tex            # Artigo técnico em LaTeX (formato IEEE)
 ├── figuras/              # Figuras geradas pelos scripts
 │   ├── fig_arch.png      # Diagrama de arquitetura do pipeline
-│   ├── fig_criteria.png  # Curvas dos 3 critérios de seleção de k
+│   ├── fig_kmeans.png    # Funcionamento do algoritmo K-Means (4 etapas)
+│   ├── fig_elbow.png     # Critério do cotovelo
+│   ├── fig_silhouette.png# Coeficiente de silhueta
+│   ├── fig_ch.png        # Índice Calinski-Harabasz
 │   └── fig_pca.png       # Clusters projetados via PCA
 ├── src/
-│   ├── pipeline.py       # Pipeline completo (pré-proc, k, K-Means, PCA, personas)
+│   ├── pipeline.py       # Pipeline completo (pré-proc, k, K-Means, critérios, PCA, personas)
 │   ├── arch.py           # Gera o diagrama de arquitetura
+│   ├── gen_kmeans.py     # Gera a figura do funcionamento do K-Means
 │   ├── Mall_Customers.csv# Dataset
 │   ├── criteria.csv      # Resultados dos critérios (gerado)
 │   └── profiles.csv      # Perfis dos clusters (gerado)
@@ -46,7 +50,8 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
 cd src
-python pipeline.py    # gera figuras em ../figuras/ e os CSVs de resultados
+python pipeline.py    # gera fig_elbow, fig_silhouette, fig_ch, fig_pca e os CSVs
+python gen_kmeans.py  # gera a figura do funcionamento do K-Means
 python arch.py        # gera o diagrama de arquitetura
 ```
 

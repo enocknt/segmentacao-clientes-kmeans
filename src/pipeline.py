@@ -29,16 +29,37 @@ crit = pd.DataFrame({"k": ks, "Inertia": np.round(inertia,2),
 crit.to_csv("criteria.csv", index=False)
 print(crit.to_string(index=False))
 
-# Figura 2: três critérios
-fig, ax = plt.subplots(1, 3, figsize=(7.2, 2.2))
-ax[0].plot(ks, inertia, "o-", color="#1f3b73"); ax[0].set_title("(a) Cotovelo"); ax[0].set_xlabel("k"); ax[0].set_ylabel("Inércia (WCSS)")
-ax[0].axvline(5, ls="--", color="#c0392b", lw=1)
-ax[1].plot(ks, sil, "s-", color="#1f3b73"); ax[1].set_title("(b) Silhueta"); ax[1].set_xlabel("k"); ax[1].set_ylabel("Coef. silhueta")
-ax[1].axvline(ks[int(np.argmax(sil))], ls="--", color="#c0392b", lw=1)
-ax[2].plot(ks, ch, "^-", color="#1f3b73"); ax[2].set_title("(c) Calinski-Harabasz"); ax[2].set_xlabel("k"); ax[2].set_ylabel("Índice CH")
-ax[2].axvline(ks[int(np.argmax(ch))], ls="--", color="#c0392b", lw=1)
-for a in ax: a.grid(alpha=.3)
-plt.tight_layout(); plt.savefig("../figuras/fig_criteria.png", bbox_inches="tight"); plt.close()
+# Três critérios em figuras SEPARADAS (cotovelo, silhueta, Calinski-Harabasz)
+NAVY, RED = "#1f3b73", "#c0392b"
+
+# (a) Cotovelo
+fig, a = plt.subplots(figsize=(3.4, 2.6))
+a.plot(ks, inertia, "o-", color=NAVY, lw=1.8, ms=6)
+a.axvline(5, ls="--", color=RED, lw=1.3)
+a.annotate("cotovelo\n$k=5$", xy=(5, inertia[3]), xytext=(6.2, inertia[3]+60),
+           fontsize=9.5, color=RED, arrowprops=dict(arrowstyle="->", color=RED, lw=1.1))
+a.set_xlabel("Número de grupos $k$"); a.set_ylabel("Inércia (WCSS)"); a.grid(alpha=.3)
+plt.tight_layout(); plt.savefig("../figuras/fig_elbow.png", bbox_inches="tight"); plt.close()
+
+# (b) Silhueta
+bi = int(np.argmax(sil))
+fig, a = plt.subplots(figsize=(3.4, 2.6))
+a.plot(ks, sil, "s-", color=NAVY, lw=1.8, ms=6)
+a.axvline(ks[bi], ls="--", color=RED, lw=1.3)
+a.annotate(f"máximo\n$k={ks[bi]}$", xy=(ks[bi], sil[bi]), xytext=(ks[bi]+0.6, sil[bi]-0.025),
+           fontsize=9.5, color=RED, arrowprops=dict(arrowstyle="->", color=RED, lw=1.1))
+a.set_xlabel("Número de grupos $k$"); a.set_ylabel("Coeficiente de silhueta"); a.grid(alpha=.3)
+plt.tight_layout(); plt.savefig("../figuras/fig_silhouette.png", bbox_inches="tight"); plt.close()
+
+# (c) Calinski-Harabasz
+bc = int(np.argmax(ch))
+fig, a = plt.subplots(figsize=(3.4, 2.6))
+a.plot(ks, ch, "^-", color=NAVY, lw=1.8, ms=7)
+a.axvline(ks[bc], ls="--", color=RED, lw=1.3)
+a.annotate(f"máximo\n$k={ks[bc]}$", xy=(ks[bc], ch[bc]), xytext=(ks[bc]+0.5, ch[bc]-12),
+           fontsize=9.5, color=RED, arrowprops=dict(arrowstyle="->", color=RED, lw=1.1))
+a.set_xlabel("Número de grupos $k$"); a.set_ylabel("Índice Calinski-Harabasz"); a.grid(alpha=.3)
+plt.tight_layout(); plt.savefig("../figuras/fig_ch.png", bbox_inches="tight"); plt.close()
 
 best_sil = ks[int(np.argmax(sil))]
 best_ch = ks[int(np.argmax(ch))]
